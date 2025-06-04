@@ -55,6 +55,7 @@
       color: #004d66;
       animation: fadeIn 4s ease forwards;
       opacity: 0;
+      display: none;
     }
 
     #heart-btn {
@@ -139,7 +140,7 @@
   </style>
 </head>
 <body>
-  <audio autoplay loop>
+  <audio id="bg-music" loop>
     <source src="https://cherno666.github.io/sy.mp3" type="audio/mp3">
   </audio>
 
@@ -149,7 +150,7 @@
   <div class="container">
     <h1>🏸 Happy Birthday, Wong Shu Yee! 🌊</h1>
     <p>May your life be as free as the sea and as fun as a badminton rally!</p>
-    <p class="gift-line">Can I gift myself to you?</p>
+    <p class="gift-line" id="gift-line">Can I gift myself to you?</p>
   </div>
   <button id="heart-btn">Click for 💖</button>
 
@@ -273,7 +274,25 @@
     }
     rippleFireworks();
 
+    // Button click logic
     document.getElementById("heart-btn").addEventListener("click", () => {
+      // 播放音乐
+      const music = document.getElementById("bg-music");
+      music.play().catch(err => console.log("自动播放失败:", err));
+
+      // 显示 gift-line
+      const giftLine = document.getElementById("gift-line");
+      giftLine.style.display = "block";
+
+      // 强制触发动画效果
+      setTimeout(() => {
+        giftLine.style.opacity = "1";
+      }, 10);
+
+      // 隐藏按钮
+      document.getElementById("heart-btn").style.display = "none";
+
+      // 爱心效果
       const heart = document.createElement("div");
       heart.className = "heart";
       heart.style.left = Math.random() * window.innerWidth + "px";
