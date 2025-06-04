@@ -19,6 +19,7 @@
       background: linear-gradient(to bottom, #a8e0ff, #dff6ff);
       color: #00334e;
       text-align: center;
+      cursor: pointer;
     }
 
     canvas {
@@ -39,8 +40,9 @@
     h1 {
       font-size: 3em;
       color: #007acc;
-      animation: glow 2s ease-in-out infinite alternate;
+      animation: glow 2s ease-in-out infinite alternate, floatText 3s ease-in-out infinite;
       margin-bottom: 20px;
+      display: inline-block;
     }
 
     p {
@@ -55,7 +57,7 @@
       color: #004d66;
       animation: fadeIn 4s ease forwards;
       opacity: 0;
-      display: block;
+      display: none; /* 修改为隐藏 */
     }
 
     #heart-btn {
@@ -72,6 +74,11 @@
       cursor: pointer;
       animation: glow 2s ease-in-out infinite alternate;
       z-index: 2;
+      transition: transform 0.2s;
+    }
+
+    #heart-btn:active {
+      transform: translateX(-50%) scale(0.95);
     }
 
     .heart {
@@ -80,7 +87,6 @@
       height: 20px;
       background-color: #ff5c8d;
       transform: rotate(45deg);
-      animation: floatUp 1s ease forwards;
       z-index: 3;
     }
 
@@ -138,6 +144,36 @@
         opacity: 1;
       }
     }
+
+    @keyframes floatText {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .star {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background-color: white;
+      border-radius: 50%;
+      z-index: 3;
+      animation: starFade 1s ease forwards;
+    }
+
+    @keyframes starFade {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -149,7 +185,7 @@
   <canvas id="fireworks"></canvas>
 
   <div class="container">
-    <h1>🏸 Happy Birthday, Wong Shu Yee! 🌊</h1>
+    <h1>🏸  Happy Birthday, Wong Shu Yee! 🌊</h1>
     <p>May your life be as free as the sea and as fun as a badminton rally!</p>
     <p class="gift-line" id="gift-line">Can I gift myself to you?</p>
   </div>
@@ -283,16 +319,16 @@
         this.particles = [];
         this.particleCount = 100;
         this.colors = [
-          '#ff0000', '#00ff00', '#0000ff', '#ffff00', 
+          '#ff0000', '#00ff00', '#0000ff', '#ffff00',
           '#ff00ff', '#00ffff', '#ff8800', '#ff0088'
         ];
-        
+
         for (let i = 0; i < this.particleCount; i++) {
           const angle = Math.random() * Math.PI * 2;
           const speed = Math.random() * 5 + 2;
           const size = Math.random() * 3 + 1;
           const color = this.colors[Math.floor(Math.random() * this.colors.length)];
-          
+
           this.particles.push({
             x: this.x,
             y: this.y,
@@ -305,7 +341,7 @@
           });
         }
       }
-      
+
       update() {
         for (let i = 0; i < this.particles.length; i++) {
           const p = this.particles[i];
@@ -313,16 +349,16 @@
           p.y += p.vy;
           p.vy += p.gravity;
           p.alpha -= 0.01;
-          
+
           if (p.alpha <= 0) {
             this.particles.splice(i, 1);
             i--;
           }
         }
-        
+
         return this.particles.length > 0;
       }
-      
+
       draw() {
         for (let p of this.particles) {
           ctx2.globalAlpha = p.alpha;
@@ -338,13 +374,13 @@
     const fireworks = [];
     function updateFireworks() {
       ctx2.clearRect(0, 0, width, height);
-      
+
       // Draw existing ripples
       for (let i = ripples.length - 1; i >= 0; i--) {
         ripples[i].draw();
         if (ripples[i].alpha <= 0) ripples.splice(i, 1);
       }
-      
+
       // Update and draw fireworks
       for (let i = 0; i < fireworks.length; i++) {
         fireworks[i].draw();
@@ -353,7 +389,7 @@
           i--;
         }
       }
-      
+
       requestAnimationFrame(updateFireworks);
     }
     updateFireworks();
@@ -367,21 +403,16 @@
       // 显示 gift-line
       const giftLine = document.getElementById("gift-line");
       giftLine.style.display = "block";
-
-      // 强制触发动画效果
       setTimeout(() => {
         giftLine.style.opacity = "1";
       }, 10);
 
-      // 爱心效果
+      // 强制触发动画效果
+
+      // 爱心效果（带轨迹）
       for (let i = 0; i < 10; i++) {
         setTimeout(() => {
-          const heart = document.createElement("div");
-          heart.className = "heart";
-          heart.style.left = Math.random() * window.innerWidth + "px";
-          heart.style.top = window.innerHeight - 50 + "px";
-          document.body.appendChild(heart);
-          setTimeout(() => heart.remove(), 1000);
+          createHeartWithTrajectory();
         }, i * 100);
       }
 
@@ -392,6 +423,88 @@
           const y = Math.random() * height * 0.6;
           fireworks.push(new Firework(x, y));
         }, i * 300);
+      }
+    });
+
+    // 创建带轨迹的爱心
+    function createHeartWithTrajectory() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+
+      // 随机起始位置
+      const startX = Math.random() * window.innerWidth;
+      const startY = window.innerHeight - 50;
+
+      heart.style.left = startX + "px";
+      heart.style.top = startY + "px";
+
+      document.body.appendChild(heart);
+
+      // 添加轨迹动画
+      const endX = startX + (Math.random() * 200 - 100); // 随机水平偏移
+      const endY = startY - 200 - Math.random() * 100; // 向上飘
+      const duration = 1000; // 1秒
+      const startTime = Date.now();
+
+      function animateHeart() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // 使用二次贝塞尔曲线模拟抛物线轨迹
+        const x = startX + (endX - startX) * progress;
+        const y = startY + (endY - startY) * progress - Math.sin(progress * Math.PI) * 50; // 添加弧度
+
+        heart.style.left = x + "px";
+        heart.style.top = y + "px";
+
+        if (progress < 1) {
+          requestAnimationFrame(animateHeart);
+        } else {
+          heart.remove();
+        }
+      }
+
+      requestAnimationFrame(animateHeart);
+    }
+
+    // 点击页面任意位置产生小爱心或星星
+    document.addEventListener("click", (e) => {
+      // 如果点击的是按钮，不触发此效果
+      if (e.target.id === "heart-btn") return;
+
+      // 随机决定是产生爱心还是星星
+      if (Math.random() > 0.5) {
+        // 创建小爱心
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.style.left = e.clientX + "px";
+        heart.style.top = e.clientY + "px";
+        heart.style.width = "15px";
+        heart.style.height = "15px";
+
+        // 自定义爱心样式
+        heart.style.animation = "floatUp 1s ease forwards";
+
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+      } else {
+        // 创建星星
+        const star = document.createElement("div");
+        star.className = "star";
+        star.style.left = e.clientX + "px";
+        star.style.top = e.clientY + "px";
+
+        // 随机星星大小和颜色
+        const size = Math.random() * 5 + 3;
+        star.style.width = size + "px";
+        star.style.height = size + "px";
+
+        // 随机星星颜色
+        const colors = ["#ffcc00", "#ff6b6b", "#48cae4", "#90e0ef", "#caf0f8"];
+        star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), 1000);
       }
     });
   </script>
