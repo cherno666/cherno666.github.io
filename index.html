@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday Wong Shu Yee</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Pacifico', cursive;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #a8e0ff, #dff6ff);
+      color: #00334e;
+      text-align: center;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 3em;
+      color: #007acc;
+      animation: glow 2s ease-in-out infinite alternate;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.5em;
+      color: #005f73;
+      animation: pulse 3s infinite;
+    }
+
+    .gift-line {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #004d66;
+      animation: fadeIn 4s ease forwards;
+      opacity: 0;
+    }
+
+    #heart-btn {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ff5c8d;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 1.2em;
+      cursor: pointer;
+      animation: glow 2s ease-in-out infinite alternate;
+      z-index: 2;
+    }
+
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #ff5c8d;
+      transform: rotate(45deg);
+      animation: floatUp 1s ease forwards;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #ff5c8d;
+      border-radius: 50%;
+    }
+
+    .heart::before {
+      top: -10px;
+      left: 0;
+    }
+
+    .heart::after {
+      left: -10px;
+      top: 0;
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: rotate(45deg) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: rotate(45deg) translateY(-100px);
+      }
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #a2d2ff, 0 0 20px #a2d2ff;
+      }
+      to {
+        text-shadow: 0 0 20px #48cae4, 0 0 30px #48cae4;
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.9;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <audio autoplay loop>
+    <source src="https://cdn.pixabay.com/download/audio/2023/03/28/audio_e348d8a788.mp3?filename=soft-piano-ambient-144998.mp3" type="audio/mp3">
+  </audio>
+
+  <canvas id="bg"></canvas>
+  <canvas id="fireworks"></canvas>
+
+  <div class="container">
+    <h1>🏸 Happy Birthday, Wong Shu Yee! 🌊</h1>
+    <p>May your life be as free as the sea and as fun as a badminton rally!</p>
+    <p class="gift-line">Can I gift myself to you?</p>
+  </div>
+  <button id="heart-btn">Click for 💖</button>
+
+  <script>
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const canvas2 = document.getElementById("fireworks");
+    const ctx2 = canvas2.getContext("2d");
+    canvas2.width = width;
+    canvas2.height = height;
+    canvas2.style.zIndex = 1;
+    canvas2.style.position = 'absolute';
+    canvas2.style.top = 0;
+    canvas2.style.left = 0;
+
+    window.onresize = () => {
+      width = canvas.width = canvas2.width = window.innerWidth;
+      height = canvas.height = canvas2.height = window.innerHeight;
+    };
+
+    const shuttleImg = new Image();
+    shuttleImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Shuttlecock.png/64px-Shuttlecock.png";
+
+    const waveCount = 100;
+    const waves = [];
+    const shuttles = [];
+
+    class Wave {
+      constructor(x) {
+        this.x = x;
+        this.y = height - Math.random() * 50;
+        this.r = Math.random() * 10 + 20;
+        this.speed = Math.random() * 0.05 + 0.02;
+        this.phase = Math.random() * Math.PI * 2;
+      }
+
+      draw() {
+        const yOffset = Math.sin(this.phase) * 10;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y + yOffset, this.r, 0, Math.PI);
+        ctx.fillStyle = "rgba(0,191,255,0.3)";
+        ctx.fill();
+        this.phase += this.speed;
+      }
+    }
+
+    class Shuttle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = -Math.random() * height;
+        this.vx = Math.random() * 1 - 0.5;
+        this.vy = Math.random() * 2 + 1;
+        this.size = Math.random() * 20 + 30;
+        this.angle = 0;
+        this.rotation = Math.random() * 0.05;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.drawImage(shuttleImg, -this.size / 2, -this.size / 2, this.size, this.size);
+        ctx.restore();
+        this.x += this.vx;
+        this.y += this.vy;
+        this.angle += this.rotation;
+
+        if (this.y > height + this.size) this.reset();
+      }
+    }
+
+    for (let i = 0; i < waveCount; i++) waves.push(new Wave((i / waveCount) * width));
+    for (let i = 0; i < 20; i++) shuttles.push(new Shuttle());
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let wave of waves) wave.draw();
+      for (let shuttle of shuttles) shuttle.draw();
+      requestAnimationFrame(animate);
+    }
+
+    shuttleImg.onload = animate;
+
+    // Wavy fireworks
+    class Ripple {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 0;
+        this.alpha = 1;
+      }
+      draw() {
+        ctx2.beginPath();
+        ctx2.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        ctx2.strokeStyle = `rgba(0,150,255,${this.alpha})`;
+        ctx2.lineWidth = 3;
+        ctx2.stroke();
+        this.radius += 2;
+        this.alpha -= 0.02;
+      }
+    }
+
+    const ripples = [];
+    function rippleFireworks() {
+      ctx2.clearRect(0, 0, width, height);
+      if (Math.random() < 0.1) {
+        ripples.push(new Ripple(Math.random() * width, Math.random() * height * 0.6));
+      }
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        ripples[i].draw();
+        if (ripples[i].alpha <= 0) ripples.splice(i, 1);
+      }
+      requestAnimationFrame(rippleFireworks);
+    }
+    rippleFireworks();
+
+    document.getElementById("heart-btn").addEventListener("click", () => {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.style.left = Math.random() * window.innerWidth + "px";
+      heart.style.top = window.innerHeight - 50 + "px";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 1000);
+    });
+  </script>
+</body>
+</html>
