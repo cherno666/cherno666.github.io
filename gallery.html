@@ -114,9 +114,68 @@
     @media (prefers-reduced-motion: reduce) {
       figure { animation: none; }
     }
+
+    /* ---------- 密码门 ---------- */
+    .gate {
+      position: fixed; inset: 0; z-index: 999;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      background: linear-gradient(165deg,#fff1f5 0%,#ffe6ee 40%,#fdeaf6 70%,#f6e9ff 100%);
+      transition: opacity .5s ease, visibility .5s ease;
+    }
+    .gate.hide { opacity: 0; visibility: hidden; }
+    .gate-box { text-align: center; max-width: 340px; width: 100%; }
+    .gate-mark {
+      width: 54px; height: 54px; margin: 0 auto 22px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #f7b2c8, #c66b8c);
+      box-shadow: 0 10px 26px rgba(198,107,140,.4);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.4em;
+    }
+    .gate-box h2 {
+      font-family: "Songti SC","STSong","SimSun",Georgia,serif;
+      font-size: 1.7em; letter-spacing: .18em; color: #b4577a; padding-left: .18em;
+      margin-bottom: 10px;
+    }
+    .gate-sub { color: #9a7484; font-size: .9em; letter-spacing: .05em; margin-bottom: 28px; }
+    #gateInput {
+      width: 100%; padding: 14px 16px; border-radius: 12px; font-size: 1.1em;
+      text-align: center; letter-spacing: .35em; text-indent: .35em;
+      border: 1px solid rgba(198,107,140,.35); background: rgba(255,255,255,.85);
+      color: #5b3a48; outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    #gateInput:focus { border-color: #c66b8c; box-shadow: 0 0 0 4px rgba(198,107,140,.15); }
+    #gateBtn {
+      margin-top: 18px; width: 100%; padding: 13px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg,#e58aa8,#c66b8c); color: #fff; font-size: 1.05em;
+      letter-spacing: .2em; text-indent: .2em; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(198,107,140,.35);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    #gateBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(198,107,140,.45); }
+    #gateBtn:active { transform: translateY(0) scale(.99); }
+    .gate-err { margin-top: 14px; color: #d1495b; font-size: .85em; min-height: 1.2em; }
+    .gate.shake { animation: gateShake .36s; }
+    @keyframes gateShake {
+      20% { transform: translateX(-7px); }
+      50% { transform: translateX(7px); }
+      80% { transform: translateX(-4px); }
+    }
   </style>
 </head>
 <body>
+  <!-- 密码门（默认盖在最上层，输对才淡出） -->
+  <div class="gate" id="gate">
+    <div class="gate-box">
+      <div class="gate-mark">&#10084;</div>
+      <h2>我们的瞬间</h2>
+      <p class="gate-sub">输入密码，查看我们的照片</p>
+      <input id="gateInput" type="password" inputmode="numeric" autocomplete="off" placeholder="请输入密码" />
+      <button id="gateBtn">进 入</button>
+      <p class="gate-err" id="gateErr"></p>
+    </div>
+  </div>
+
   <header>
     <div class="eyebrow">Our Moments</div>
     <h1>我们的瞬间</h1>
@@ -316,6 +375,49 @@
       if (e.key === 'ArrowLeft') openAt(current - 1);
       if (e.key === 'ArrowRight') openAt(current + 1);
     });
+
+    /* ---------- 密码门逻辑 ---------- */
+    (function () {
+      const PASS = '0605';
+      const KEY = 'gallery_unlocked';
+      const gate = document.getElementById('gate');
+      const input = document.getElementById('gateInput');
+      const btn = document.getElementById('gateBtn');
+      const err = document.getElementById('gateErr');
+
+      let unlocked = false;
+      try { unlocked = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+
+      function unlock() {
+        gate.classList.add('hide');
+        try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+        document.body.style.overflow = '';
+      }
+
+      if (unlocked) {
+        unlock();
+      } else {
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => input.focus(), 120);
+      }
+
+      function tryPass() {
+        if (input.value.trim() === PASS) {
+          err.textContent = '';
+          unlock();
+        } else {
+          err.textContent = '密码不对，再试一次';
+          gate.classList.remove('shake');
+          void gate.offsetWidth;
+          gate.classList.add('shake');
+          input.value = '';
+          input.focus();
+        }
+      }
+
+      btn.addEventListener('click', tryPass);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryPass(); });
+    })();
   </script>
 </body>
 </html>
