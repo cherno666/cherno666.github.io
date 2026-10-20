@@ -5,168 +5,335 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>我们的瞬间 · Our Moments</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      min-height: 100%;
-      font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
-      color: #5b3a4a;
-      background: linear-gradient(160deg, #fff0f3 0%, #ffe3ec 40%, #fde2ff 100%);
+    :root {
+      --card-shadow: 0 6px 20px rgba(150, 90, 110, 0.14);
+      --card-shadow-hover: 0 18px 40px rgba(150, 90, 110, 0.26);
+      --ink: #5b3a48;
+      --ink-soft: #9a7484;
+      --accent: #c66b8c;
     }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100%;
+      color: var(--ink);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #fff7fa 0%, rgba(255,247,250,0) 60%),
+        linear-gradient(165deg, #fff1f5 0%, #ffe6ee 35%, #fdeaf6 70%, #f6e9ff 100%);
+      background-attachment: fixed;
+    }
+
+    /* ---------- header ---------- */
     header {
       text-align: center;
-      padding: 48px 20px 24px;
+      padding: 72px 20px 28px;
     }
+
+    header .eyebrow {
+      font-size: 0.8em;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 18px;
+      padding-left: 0.42em;
+    }
+
     header h1 {
-      font-size: 2.2em;
-      letter-spacing: 2px;
-      color: #c2567a;
-      font-weight: 700;
+      font-family: "Songti SC", "STSong", "SimSun", Georgia, serif;
+      font-size: clamp(2em, 5.5vw, 3.1em);
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      color: #b4577a;
+      padding-left: 0.16em;
     }
+
+    header .rule {
+      width: 64px;
+      height: 1px;
+      margin: 26px auto 0;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
     header p {
-      margin-top: 10px;
-      font-size: 1.05em;
-      color: #9b6b7d;
+      margin-top: 20px;
+      font-size: 1em;
+      color: var(--ink-soft);
+      letter-spacing: 0.06em;
     }
+
+    /* ---------- grid ---------- */
     .grid {
-      max-width: 1100px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 16px 20px 60px;
+      padding: 34px 18px 40px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
     }
+
     figure {
       margin: 0;
-      border-radius: 14px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.55);
-      box-shadow: 0 8px 24px rgba(194,86,122,0.18);
+      padding: 7px 7px 0;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
       cursor: pointer;
-      transition: transform .25s ease, box-shadow .25s ease;
+      /* 入场动画初始态 */
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1),
+                  box-shadow .35s ease, translate .35s ease;
     }
+
+    figure.visible { opacity: 1; transform: translateY(0); }
+
     figure:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 14px 32px rgba(194,86,122,0.28);
+      translate: 0 -6px;
+      box-shadow: var(--card-shadow-hover);
     }
+
     figure img {
       width: 100%;
-      height: 220px;
+      aspect-ratio: 3 / 4;
       object-fit: cover;
       display: block;
+      border-radius: 7px;
+      background: #fdeef2;
     }
+
     figcaption {
-      padding: 8px 12px;
-      font-size: 0.9em;
-      color: #8a5a6c;
+      padding: 11px 4px 10px;
+      font-size: 0.78em;
+      letter-spacing: 0.08em;
+      color: var(--ink-soft);
       text-align: center;
     }
-    .empty {
-      max-width: 600px;
-      margin: 40px auto;
+
+    /* ---------- footer ---------- */
+    footer {
       text-align: center;
-      color: #a9788a;
-      font-size: 1.05em;
-      line-height: 1.8;
+      padding: 18px 20px 64px;
+      font-size: 0.85em;
+      color: #b58aa0;
     }
-    /* lightbox */
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(198,107,140,.35);
+      padding-bottom: 2px;
+    }
+    footer a:hover { border-bottom-color: var(--accent); }
+
+    /* ---------- lightbox ---------- */
     .lightbox {
       position: fixed;
       inset: 0;
-      background: rgba(40, 20, 30, 0.88);
+      z-index: 99;
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 99;
-      padding: 24px;
+      padding: 5vh 16px;
+      background: rgba(38, 22, 30, .82);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity .32s ease;
     }
-    .lightbox.open { display: flex; }
+    .lightbox.show { display: flex; }
+    .lightbox.in   { opacity: 1; }
+
     .lightbox img {
       max-width: 92vw;
       max-height: 88vh;
       border-radius: 10px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+      transform: scale(.965);
+      transition: transform .32s cubic-bezier(.22,.61,.36,1);
     }
-    .lightbox .close {
+    .lightbox.in img { transform: scale(1); }
+
+    .lb-btn {
+      position: absolute;
+      top: 50%;
+      translate: 0 -50%;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, .14);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .25s ease;
+    }
+    .lb-btn:hover { background: rgba(255, 255, 255, .28); }
+    .lb-prev { left: 18px; }
+    .lb-next { right: 18px; }
+
+    .lb-close {
       position: absolute;
       top: 18px;
-      right: 26px;
+      right: 22px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, .14);
       color: #fff;
-      font-size: 34px;
-      cursor: pointer;
+      font-size: 22px;
       line-height: 1;
-      opacity: 0.85;
+      cursor: pointer;
     }
-    .lightbox .close:hover { opacity: 1; }
-    footer {
+    .lb-close:hover { background: rgba(255,255,255,.28); }
+
+    .lb-count {
+      position: absolute;
+      bottom: 22px;
+      left: 0;
+      right: 0;
       text-align: center;
-      padding: 0 20px 40px;
+      color: rgba(255, 255, 255, .82);
       font-size: 0.85em;
-      color: #b58aa0;
+      letter-spacing: 0.14em;
     }
-    footer a { color: #c2567a; text-decoration: none; }
+
+    @media (max-width: 520px) {
+      .grid { gap: 14px; padding: 28px 12px 32px; }
+      .lb-btn { width: 38px; height: 38px; font-size: 17px; }
+      .lb-prev { left: 8px; }
+      .lb-next { right: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      figure { transition: none; opacity: 1; transform: none; }
+    }
   </style>
 </head>
+
 <body>
   <header>
+    <div class="eyebrow">Our Moments</div>
     <h1>我们的瞬间</h1>
-    <p>Our Moments · 点点滴滴，都值得珍藏</p>
+    <div class="rule"></div>
+    <p id="count">正在整理照片…</p>
   </header>
 
   <main class="grid" id="grid"></main>
-
-  <div class="empty" id="empty" style="display:none;">
-    还没有照片哦～<br />
-      把你们的合照放进 <code>photos/</code> 文件夹，命名为 <code>1.jpg</code>、<code>2.jpg</code>…<br />
-      刷新本页就会自动出现啦。
-  </div>
 
   <footer>
     <a href="./">返回首页</a>
   </footer>
 
-  <div class="lightbox" id="lightbox">
-    <span class="close" id="lbClose">&times;</span>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+    <button class="lb-close" id="lbClose" aria-label="关闭">&times;</button>
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="上一张">&#8249;</button>
     <img id="lbImg" src="" alt="" />
+    <button class="lb-btn lb-next" id="lbNext" aria-label="下一张">&#8250;</button>
+    <div class="lb-count" id="lbCount"></div>
   </div>
 
   <script>
-    // 自动发现 photos/ 下的图片：1.jpg, 2.jpg ... 支持常见扩展名
     const MAX = 80;
-    const exts = ["jpg", "jpeg", "png", "webp", "gif"];
     const grid = document.getElementById("grid");
-    const empty = document.getElementById("empty");
     const lightbox = document.getElementById("lightbox");
     const lbImg = document.getElementById("lbImg");
-    let found = 0;
+    const lbCount = document.getElementById("lbCount");
+    const counter = document.getElementById("count");
 
-    function openLightbox(src) {
-      lbImg.src = src;
-      lightbox.classList.add("open");
+    let current = 0;
+
+    // 已成功加载的 figure（DOM 顺序即编号顺序）
+    const visibleFigures = () => Array.from(grid.querySelectorAll("figure.visible"));
+
+    function openAt(index) {
+      const list = visibleFigures();
+      if (!list.length) return;
+      current = (index + list.length) % list.length;
+      const fig = list[current];
+      lbImg.src = fig.dataset.full;
+      lbImg.alt = "照片 " + fig.dataset.num;
+      lbCount.textContent = (current + 1) + " / " + list.length;
+      lightbox.classList.add("show");
+      requestAnimationFrame(() => lightbox.classList.add("in"));
     }
-    document.getElementById("lbClose").onclick = () => lightbox.classList.remove("open");
-    lightbox.onclick = (e) => { if (e.target === lightbox) lightbox.classList.remove("open"); };
 
+    function close() {
+      lightbox.classList.remove("in");
+      setTimeout(() => lightbox.classList.remove("show"), 320);
+    }
+
+    document.getElementById("lbClose").onclick = close;
+    document.getElementById("lbPrev").onclick = (e) => { e.stopPropagation(); openAt(current - 1); };
+    document.getElementById("lbNext").onclick = (e) => { e.stopPropagation(); openAt(current + 1); };
+    lightbox.onclick = (e) => { if (e.target === lightbox) close(); };
+
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("show")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") openAt(current - 1);
+      if (e.key === "ArrowRight") openAt(current + 1);
+    });
+
+    // 按顺序创建 figure（DOM 顺序固定），加载成功才显示
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) { en.target.classList.add("visible"); observer.unobserve(en.target); }
+      });
+    }, { rootMargin: "80px" });
+
+    let settled = 0;
     for (let i = 1; i <= MAX; i++) {
       const figure = document.createElement("figure");
       const img = document.createElement("img");
       const cap = document.createElement("figcaption");
-      cap.textContent = "照片 " + i;
+
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.alt = "照片 " + i;
+      cap.textContent = i;
+
+      figure.dataset.num = i;
+      figure.dataset.full = `photos/${i}.jpg`;
       figure.appendChild(img);
       figure.appendChild(cap);
-      figure.onclick = () => openLightbox(img.src);
+      figure.style.display = "none";
 
-      let k = 0;
-      const tryExt = () => {
-        if (k >= exts.length) { figure.remove(); return; }
-        img.onerror = () => { k++; tryExt(); };
-        img.onload = () => { found++; grid.appendChild(figure); };
-        img.src = `photos/${i}.${exts[k]}`;
+      let done = false;
+      img.onload = () => {
+        if (done) return; done = true;
+        figure.style.display = "";
+        observer.observe(figure);
+        figure.onclick = () => openAt(visibleFigures().indexOf(figure));
       };
-      tryExt();
+      img.onerror = () => {
+        if (done) return; done = true;
+        figure.remove();
+        settled++;
+        updateCount();
+      };
+
+      img.src = `photos/thumbs/${i}.jpg`;
+      grid.appendChild(figure);
     }
 
-    // 若一段时间仍无照片，提示一下
-    setTimeout(() => { if (found === 0) empty.style.display = "block"; }, 1500);
+    function updateCount() {
+      const n = visibleFigures().length;
+      if (n > 0) counter.textContent = `共 ${n} 张 · 点开看看`;
+    }
+
+    // 图片陆续加载完成后更新计数
+    let ticks = 0;
+    const timer = setInterval(() => {
+      updateCount();
+      if (++ticks > 40) clearInterval(timer);
+    }, 250);
   </script>
 </body>
 </html>
