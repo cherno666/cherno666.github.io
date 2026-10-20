@@ -175,6 +175,37 @@
       }
     }
   </style>
+
+  <style>
+    /* 相册入口（新增，独立样式，不影响原有任何样式） */
+    #gallery-link {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 17px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 0.95em;
+      letter-spacing: 0.05em;
+      color: #005f73;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(0, 122, 204, 0.22);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 14px rgba(0, 122, 204, 0.15);
+      transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+    }
+    #gallery-link:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 22px rgba(0, 122, 204, 0.28);
+    }
+    @media (max-width: 520px) {
+      #gallery-link { top: 12px; right: 12px; padding: 7px 13px; font-size: 0.85em; }
+    }
+  </style>
 </head>
 <body>
   <audio id="bg-music" loop>
@@ -190,6 +221,7 @@
     <p class="gift-line" id="gift-line">Can I gift myself to you?</p>
   </div>
   <button id="heart-btn">Click for 💖</button>
+  <a href="gallery.html" id="gallery-link">我们的瞬间</a>
 
   <script>
     const canvas = document.getElementById("bg");
