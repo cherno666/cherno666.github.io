@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>我们的瞬间 · Our Moments</title>
   <style>
     :root {
@@ -12,11 +13,8 @@
       --ink-soft: #9a7484;
       --accent: #c66b8c;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
-
     body {
       min-height: 100%;
       color: var(--ink);
@@ -26,206 +24,252 @@
         linear-gradient(165deg, #fff1f5 0%, #ffe6ee 35%, #fdeaf6 70%, #f6e9ff 100%);
       background-attachment: fixed;
     }
-
-    /* ---------- header ---------- */
-    header {
-      text-align: center;
-      padding: 72px 20px 28px;
-    }
-
+    header { text-align: center; padding: 72px 20px 28px; }
     header .eyebrow {
-      font-size: 0.8em;
-      letter-spacing: 0.42em;
-      text-transform: uppercase;
-      color: var(--ink-soft);
-      margin-bottom: 18px;
-      padding-left: 0.42em;
+      font-size: 0.8em; letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--ink-soft); margin-bottom: 18px; padding-left: 0.42em;
     }
-
     header h1 {
       font-family: "Songti SC", "STSong", "SimSun", Georgia, serif;
-      font-size: clamp(2em, 5.5vw, 3.1em);
-      font-weight: 600;
-      letter-spacing: 0.16em;
-      color: #b4577a;
-      padding-left: 0.16em;
+      font-size: clamp(2em, 5.5vw, 3.1em); font-weight: 600;
+      letter-spacing: 0.16em; color: #b4577a; padding-left: 0.16em;
     }
-
     header .rule {
-      width: 64px;
-      height: 1px;
-      margin: 26px auto 0;
+      width: 64px; height: 1px; margin: 26px auto 0;
       background: linear-gradient(90deg, transparent, var(--accent), transparent);
     }
-
     header p {
-      margin-top: 20px;
-      font-size: 1em;
-      color: var(--ink-soft);
-      letter-spacing: 0.06em;
+      margin-top: 20px; font-size: 1em; color: var(--ink-soft); letter-spacing: 0.06em;
     }
-
-    /* ---------- grid ---------- */
     .grid {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 34px 18px 40px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      max-width: 1180px; margin: 0 auto; padding: 34px 18px 40px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 20px;
     }
-
     figure {
-      margin: 0;
-      padding: 7px 7px 0;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: var(--card-shadow);
-      cursor: pointer;
-      /* 入场动画初始态（注意：这里不能用 display:none，否则懒加载永不触发） */
-      opacity: 0;
-      transform: translateY(14px);
-      transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1),
-                  box-shadow .35s ease, translate .35s ease;
+      margin: 0; padding: 7px 7px 0; background: #fff; border-radius: 12px;
+      box-shadow: var(--card-shadow); cursor: pointer;
+      animation: rise .7s cubic-bezier(.22,.61,.36,1) both;
+      transition: box-shadow .35s ease, translate .35s ease;
     }
-
-    figure.visible { opacity: 1; transform: translateY(0); }
-
-    figure:hover {
-      translate: 0 -6px;
-      box-shadow: var(--card-shadow-hover);
+    figure:hover { translate: 0 -6px; box-shadow: var(--card-shadow-hover); }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-
     figure img {
-      width: 100%;
-      aspect-ratio: 3 / 4;
-      object-fit: cover;
-      display: block;
-      border-radius: 7px;
-      background: #fdeef2;
+      width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block;
+      border-radius: 7px; background: #fdeef2;
     }
-
     figcaption {
-      padding: 11px 4px 10px;
-      font-size: 0.78em;
-      letter-spacing: 0.08em;
-      color: var(--ink-soft);
-      text-align: center;
+      padding: 11px 4px 10px; font-size: 0.78em; letter-spacing: 0.08em;
+      color: var(--ink-soft); text-align: center;
     }
-
-    /* ---------- footer ---------- */
-    footer {
-      text-align: center;
-      padding: 18px 20px 64px;
-      font-size: 0.85em;
-      color: #b58aa0;
-    }
-
+    footer { text-align: center; padding: 18px 20px 64px; font-size: 0.85em; color: #b58aa0; }
     footer a {
-      color: var(--accent);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(198,107,140,.35);
-      padding-bottom: 2px;
+      color: var(--accent); text-decoration: none;
+      border-bottom: 1px solid rgba(198,107,140,.35); padding-bottom: 2px;
     }
     footer a:hover { border-bottom-color: var(--accent); }
-
-    /* ---------- lightbox ---------- */
     .lightbox {
-      position: fixed;
-      inset: 0;
-      z-index: 99;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 5vh 16px;
-      background: rgba(38, 22, 30, .82);
-      backdrop-filter: blur(8px);
-      opacity: 0;
-      transition: opacity .32s ease;
+      position: fixed; inset: 0; z-index: 99; display: none; align-items: center;
+      justify-content: center; padding: 5vh 16px;
+      background: rgba(38, 22, 30, .82); backdrop-filter: blur(8px);
+      opacity: 0; transition: opacity .32s ease;
     }
     .lightbox.show { display: flex; }
     .lightbox.in   { opacity: 1; }
-
     .lightbox img {
-      max-width: 92vw;
-      max-height: 88vh;
-      border-radius: 10px;
+      max-width: 92vw; max-height: 88vh; border-radius: 10px;
       box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
-      transform: scale(.965);
-      transition: transform .32s cubic-bezier(.22,.61,.36,1);
+      transform: scale(.965); transition: transform .32s cubic-bezier(.22,.61,.36,1);
     }
     .lightbox.in img { transform: scale(1); }
-
     .lb-btn {
-      position: absolute;
-      top: 50%;
-      translate: 0 -50%;
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255, 255, 255, .14);
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute; top: 50%; translate: 0 -50%; width: 46px; height: 46px;
+      border-radius: 50%; border: none; background: rgba(255, 255, 255, .14);
+      color: #fff; font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
       transition: background .25s ease;
     }
     .lb-btn:hover { background: rgba(255, 255, 255, .28); }
     .lb-prev { left: 18px; }
     .lb-next { right: 18px; }
-
     .lb-close {
-      position: absolute;
-      top: 18px;
-      right: 22px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255, 255, 255, .14);
-      color: #fff;
-      font-size: 22px;
-      line-height: 1;
-      cursor: pointer;
+      position: absolute; top: 18px; right: 22px; width: 40px; height: 40px;
+      border-radius: 50%; border: none; background: rgba(255, 255, 255, .14);
+      color: #fff; font-size: 22px; line-height: 1; cursor: pointer;
     }
     .lb-close:hover { background: rgba(255,255,255,.28); }
-
     .lb-count {
-      position: absolute;
-      bottom: 22px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      color: rgba(255, 255, 255, .82);
-      font-size: 0.85em;
-      letter-spacing: 0.14em;
+      position: absolute; bottom: 22px; left: 0; right: 0; text-align: center;
+      color: rgba(255, 255, 255, .82); font-size: 0.85em; letter-spacing: 0.14em;
     }
-
     @media (max-width: 520px) {
       .grid { gap: 14px; padding: 28px 12px 32px; }
       .lb-btn { width: 38px; height: 38px; font-size: 17px; }
       .lb-prev { left: 8px; }
       .lb-next { right: 8px; }
     }
-
     @media (prefers-reduced-motion: reduce) {
-      figure { transition: none; opacity: 1; transform: none; }
+      figure { animation: none; }
     }
   </style>
 </head>
-
 <body>
   <header>
     <div class="eyebrow">Our Moments</div>
     <h1>我们的瞬间</h1>
     <div class="rule"></div>
-    <p id="count">正在整理照片…</p>
+    <p id="count">共 36 张 · 点开看看</p>
   </header>
 
-  <main class="grid" id="grid"></main>
+  <main class="grid" id="grid">
+    <figure data-num="1" style="animation-delay:25ms">
+      <img src="photos/thumbs/1.jpg" data-full="photos/1.jpg" alt="照片 1" loading="lazy" decoding="async" />
+      <figcaption>1</figcaption>
+    </figure>
+    <figure data-num="2" style="animation-delay:50ms">
+      <img src="photos/thumbs/2.jpg" data-full="photos/2.jpg" alt="照片 2" loading="lazy" decoding="async" />
+      <figcaption>2</figcaption>
+    </figure>
+    <figure data-num="3" style="animation-delay:75ms">
+      <img src="photos/thumbs/3.jpg" data-full="photos/3.jpg" alt="照片 3" loading="lazy" decoding="async" />
+      <figcaption>3</figcaption>
+    </figure>
+    <figure data-num="4" style="animation-delay:100ms">
+      <img src="photos/thumbs/4.jpg" data-full="photos/4.jpg" alt="照片 4" loading="lazy" decoding="async" />
+      <figcaption>4</figcaption>
+    </figure>
+    <figure data-num="5" style="animation-delay:125ms">
+      <img src="photos/thumbs/5.jpg" data-full="photos/5.jpg" alt="照片 5" loading="lazy" decoding="async" />
+      <figcaption>5</figcaption>
+    </figure>
+    <figure data-num="6" style="animation-delay:150ms">
+      <img src="photos/thumbs/6.jpg" data-full="photos/6.jpg" alt="照片 6" loading="lazy" decoding="async" />
+      <figcaption>6</figcaption>
+    </figure>
+    <figure data-num="7" style="animation-delay:175ms">
+      <img src="photos/thumbs/7.jpg" data-full="photos/7.jpg" alt="照片 7" loading="lazy" decoding="async" />
+      <figcaption>7</figcaption>
+    </figure>
+    <figure data-num="8" style="animation-delay:200ms">
+      <img src="photos/thumbs/8.jpg" data-full="photos/8.jpg" alt="照片 8" loading="lazy" decoding="async" />
+      <figcaption>8</figcaption>
+    </figure>
+    <figure data-num="9" style="animation-delay:225ms">
+      <img src="photos/thumbs/9.jpg" data-full="photos/9.jpg" alt="照片 9" loading="lazy" decoding="async" />
+      <figcaption>9</figcaption>
+    </figure>
+    <figure data-num="10" style="animation-delay:250ms">
+      <img src="photos/thumbs/10.jpg" data-full="photos/10.jpg" alt="照片 10" loading="lazy" decoding="async" />
+      <figcaption>10</figcaption>
+    </figure>
+    <figure data-num="11" style="animation-delay:275ms">
+      <img src="photos/thumbs/11.jpg" data-full="photos/11.jpg" alt="照片 11" loading="lazy" decoding="async" />
+      <figcaption>11</figcaption>
+    </figure>
+    <figure data-num="12" style="animation-delay:300ms">
+      <img src="photos/thumbs/12.jpg" data-full="photos/12.jpg" alt="照片 12" loading="lazy" decoding="async" />
+      <figcaption>12</figcaption>
+    </figure>
+    <figure data-num="13" style="animation-delay:325ms">
+      <img src="photos/thumbs/13.jpg" data-full="photos/13.jpg" alt="照片 13" loading="lazy" decoding="async" />
+      <figcaption>13</figcaption>
+    </figure>
+    <figure data-num="14" style="animation-delay:350ms">
+      <img src="photos/thumbs/14.jpg" data-full="photos/14.jpg" alt="照片 14" loading="lazy" decoding="async" />
+      <figcaption>14</figcaption>
+    </figure>
+    <figure data-num="15" style="animation-delay:375ms">
+      <img src="photos/thumbs/15.jpg" data-full="photos/15.jpg" alt="照片 15" loading="lazy" decoding="async" />
+      <figcaption>15</figcaption>
+    </figure>
+    <figure data-num="16" style="animation-delay:400ms">
+      <img src="photos/thumbs/16.jpg" data-full="photos/16.jpg" alt="照片 16" loading="lazy" decoding="async" />
+      <figcaption>16</figcaption>
+    </figure>
+    <figure data-num="17" style="animation-delay:425ms">
+      <img src="photos/thumbs/17.jpg" data-full="photos/17.jpg" alt="照片 17" loading="lazy" decoding="async" />
+      <figcaption>17</figcaption>
+    </figure>
+    <figure data-num="18" style="animation-delay:450ms">
+      <img src="photos/thumbs/18.jpg" data-full="photos/18.jpg" alt="照片 18" loading="lazy" decoding="async" />
+      <figcaption>18</figcaption>
+    </figure>
+    <figure data-num="19" style="animation-delay:475ms">
+      <img src="photos/thumbs/19.jpg" data-full="photos/19.jpg" alt="照片 19" loading="lazy" decoding="async" />
+      <figcaption>19</figcaption>
+    </figure>
+    <figure data-num="20" style="animation-delay:500ms">
+      <img src="photos/thumbs/20.jpg" data-full="photos/20.jpg" alt="照片 20" loading="lazy" decoding="async" />
+      <figcaption>20</figcaption>
+    </figure>
+    <figure data-num="21" style="animation-delay:525ms">
+      <img src="photos/thumbs/21.jpg" data-full="photos/21.jpg" alt="照片 21" loading="lazy" decoding="async" />
+      <figcaption>21</figcaption>
+    </figure>
+    <figure data-num="22" style="animation-delay:550ms">
+      <img src="photos/thumbs/22.jpg" data-full="photos/22.jpg" alt="照片 22" loading="lazy" decoding="async" />
+      <figcaption>22</figcaption>
+    </figure>
+    <figure data-num="23" style="animation-delay:575ms">
+      <img src="photos/thumbs/23.jpg" data-full="photos/23.jpg" alt="照片 23" loading="lazy" decoding="async" />
+      <figcaption>23</figcaption>
+    </figure>
+    <figure data-num="24" style="animation-delay:600ms">
+      <img src="photos/thumbs/24.jpg" data-full="photos/24.jpg" alt="照片 24" loading="lazy" decoding="async" />
+      <figcaption>24</figcaption>
+    </figure>
+    <figure data-num="25" style="animation-delay:625ms">
+      <img src="photos/thumbs/25.jpg" data-full="photos/25.jpg" alt="照片 25" loading="lazy" decoding="async" />
+      <figcaption>25</figcaption>
+    </figure>
+    <figure data-num="26" style="animation-delay:650ms">
+      <img src="photos/thumbs/26.jpg" data-full="photos/26.jpg" alt="照片 26" loading="lazy" decoding="async" />
+      <figcaption>26</figcaption>
+    </figure>
+    <figure data-num="27" style="animation-delay:675ms">
+      <img src="photos/thumbs/27.jpg" data-full="photos/27.jpg" alt="照片 27" loading="lazy" decoding="async" />
+      <figcaption>27</figcaption>
+    </figure>
+    <figure data-num="28" style="animation-delay:700ms">
+      <img src="photos/thumbs/28.jpg" data-full="photos/28.jpg" alt="照片 28" loading="lazy" decoding="async" />
+      <figcaption>28</figcaption>
+    </figure>
+    <figure data-num="29" style="animation-delay:700ms">
+      <img src="photos/thumbs/29.jpg" data-full="photos/29.jpg" alt="照片 29" loading="lazy" decoding="async" />
+      <figcaption>29</figcaption>
+    </figure>
+    <figure data-num="30" style="animation-delay:700ms">
+      <img src="photos/thumbs/30.jpg" data-full="photos/30.jpg" alt="照片 30" loading="lazy" decoding="async" />
+      <figcaption>30</figcaption>
+    </figure>
+    <figure data-num="31" style="animation-delay:700ms">
+      <img src="photos/thumbs/31.jpg" data-full="photos/31.jpg" alt="照片 31" loading="lazy" decoding="async" />
+      <figcaption>31</figcaption>
+    </figure>
+    <figure data-num="32" style="animation-delay:700ms">
+      <img src="photos/thumbs/32.jpg" data-full="photos/32.jpg" alt="照片 32" loading="lazy" decoding="async" />
+      <figcaption>32</figcaption>
+    </figure>
+    <figure data-num="33" style="animation-delay:700ms">
+      <img src="photos/thumbs/33.jpg" data-full="photos/33.jpg" alt="照片 33" loading="lazy" decoding="async" />
+      <figcaption>33</figcaption>
+    </figure>
+    <figure data-num="34" style="animation-delay:700ms">
+      <img src="photos/thumbs/34.jpg" data-full="photos/34.jpg" alt="照片 34" loading="lazy" decoding="async" />
+      <figcaption>34</figcaption>
+    </figure>
+    <figure data-num="35" style="animation-delay:700ms">
+      <img src="photos/thumbs/35.jpg" data-full="photos/35.jpg" alt="照片 35" loading="lazy" decoding="async" />
+      <figcaption>35</figcaption>
+    </figure>
+    <figure data-num="36" style="animation-delay:700ms">
+      <img src="photos/thumbs/36.jpg" data-full="photos/36.jpg" alt="照片 36" loading="lazy" decoding="async" />
+      <figcaption>36</figcaption>
+    </figure>
+  </main>
 
   <footer>
     <a href="./">返回首页</a>
@@ -240,95 +284,38 @@
   </div>
 
   <script>
-    const MAX = 80;
-    const grid = document.getElementById("grid");
-    const lightbox = document.getElementById("lightbox");
-    const lbImg = document.getElementById("lbImg");
-    const lbCount = document.getElementById("lbCount");
-    const counter = document.getElementById("count");
-
-    const figures = [];          // 按序号保存所有卡片，翻页索引以它为准
+    const figures = Array.from(document.querySelectorAll('.grid figure'));
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const lbCount = document.getElementById('lbCount');
     let current = 0;
 
     function openAt(index) {
       if (!figures.length) return;
       current = (index + figures.length) % figures.length;
       const fig = figures[current];
-      lbImg.src = fig.dataset.full;
-      lbImg.alt = "照片 " + fig.dataset.num;
-      lbCount.textContent = (current + 1) + " / " + figures.length;
-      lightbox.classList.add("show");
-      requestAnimationFrame(() => lightbox.classList.add("in"));
+      lbImg.src = fig.querySelector('img').dataset.full;
+      lbImg.alt = fig.querySelector('img').alt;
+      lbCount.textContent = (current + 1) + ' / ' + figures.length;
+      lightbox.classList.add('show');
+      requestAnimationFrame(() => lightbox.classList.add('in'));
     }
-
     function close() {
-      lightbox.classList.remove("in");
-      setTimeout(() => lightbox.classList.remove("show"), 320);
+      lightbox.classList.remove('in');
+      setTimeout(() => lightbox.classList.remove('show'), 320);
     }
+    figures.forEach((fig, i) => { fig.onclick = () => openAt(i); });
 
-    document.getElementById("lbClose").onclick = close;
-    document.getElementById("lbPrev").onclick = (e) => { e.stopPropagation(); openAt(current - 1); };
-    document.getElementById("lbNext").onclick = (e) => { e.stopPropagation(); openAt(current + 1); };
+    document.getElementById('lbClose').onclick = close;
+    document.getElementById('lbPrev').onclick = (e) => { e.stopPropagation(); openAt(current - 1); };
+    document.getElementById('lbNext').onclick = (e) => { e.stopPropagation(); openAt(current + 1); };
     lightbox.onclick = (e) => { if (e.target === lightbox) close(); };
-
-    document.addEventListener("keydown", (e) => {
-      if (!lightbox.classList.contains("show")) return;
-      if (e.key === "Escape") close();
-      if (e.key === "ArrowLeft") openAt(current - 1);
-      if (e.key === "ArrowRight") openAt(current + 1);
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('show')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowLeft') openAt(current - 1);
+      if (e.key === 'ArrowRight') openAt(current + 1);
     });
-
-    // 滚动淡入：卡片始终占位（opacity:0 仍有布局），所以能正常触发懒加载与监听
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (en.isIntersecting) {
-          en.target.classList.add("visible");
-          observer.unobserve(en.target);
-        }
-      });
-    }, { rootMargin: "80px" });
-
-    // 先探测实际有几张照片（遇到第一张不存在的就停），避免留下空白占位
-    function probe(i) {
-      return new Promise((resolve) => {
-        const im = new Image();
-        im.onload = () => resolve(true);
-        im.onerror = () => resolve(false);
-        im.src = `photos/thumbs/${i}.jpg`;
-      });
-    }
-
-    (async function build() {
-      let n = 0;
-      for (let i = 1; i <= MAX; i++) {
-        if (!(await probe(i))) break;
-        n = i;
-      }
-
-      for (let i = 1; i <= n; i++) {
-        const figure = document.createElement("figure");
-        const img = document.createElement("img");
-        const cap = document.createElement("figcaption");
-
-        img.loading = "lazy";
-        img.decoding = "async";
-        img.alt = "照片 " + i;
-        img.src = `photos/thumbs/${i}.jpg`;
-        cap.textContent = i;
-
-        figure.dataset.num = i;
-        figure.dataset.full = `photos/${i}.jpg`;
-        figure.appendChild(img);
-        figure.appendChild(cap);
-        figure.onclick = () => openAt(figures.indexOf(figure));
-
-        figures.push(figure);
-        grid.appendChild(figure);
-        observer.observe(figure);
-      }
-
-      counter.textContent = n > 0 ? `共 ${n} 张 · 点开看看` : "还没有照片";
-    })();
   </script>
 </body>
 </html>
