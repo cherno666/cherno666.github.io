@@ -82,7 +82,7 @@
       border-radius: 12px;
       box-shadow: var(--card-shadow);
       cursor: pointer;
-      /* 入场动画初始态 */
+      /* 入场动画初始态（注意：这里不能用 display:none，否则懒加载永不触发） */
       opacity: 0;
       transform: translateY(14px);
       transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1),
@@ -247,19 +247,16 @@
     const lbCount = document.getElementById("lbCount");
     const counter = document.getElementById("count");
 
+    const figures = [];          // 按序号保存所有卡片，翻页索引以它为准
     let current = 0;
 
-    // 已成功加载的 figure（DOM 顺序即编号顺序）
-    const visibleFigures = () => Array.from(grid.querySelectorAll("figure.visible"));
-
     function openAt(index) {
-      const list = visibleFigures();
-      if (!list.length) return;
-      current = (index + list.length) % list.length;
-      const fig = list[current];
+      if (!figures.length) return;
+      current = (index + figures.length) % figures.length;
+      const fig = figures[current];
       lbImg.src = fig.dataset.full;
       lbImg.alt = "照片 " + fig.dataset.num;
-      lbCount.textContent = (current + 1) + " / " + list.length;
+      lbCount.textContent = (current + 1) + " / " + figures.length;
       lightbox.classList.add("show");
       requestAnimationFrame(() => lightbox.classList.add("in"));
     }
@@ -281,59 +278,57 @@
       if (e.key === "ArrowRight") openAt(current + 1);
     });
 
-    // 按顺序创建 figure（DOM 顺序固定），加载成功才显示
+    // 滚动淡入：卡片始终占位（opacity:0 仍有布局），所以能正常触发懒加载与监听
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((en) => {
-        if (en.isIntersecting) { en.target.classList.add("visible"); observer.unobserve(en.target); }
+        if (en.isIntersecting) {
+          en.target.classList.add("visible");
+          observer.unobserve(en.target);
+        }
       });
     }, { rootMargin: "80px" });
 
-    let settled = 0;
-    for (let i = 1; i <= MAX; i++) {
-      const figure = document.createElement("figure");
-      const img = document.createElement("img");
-      const cap = document.createElement("figcaption");
+    // 先探测实际有几张照片（遇到第一张不存在的就停），避免留下空白占位
+    function probe(i) {
+      return new Promise((resolve) => {
+        const im = new Image();
+        im.onload = () => resolve(true);
+        im.onerror = () => resolve(false);
+        im.src = `photos/thumbs/${i}.jpg`;
+      });
+    }
 
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.alt = "照片 " + i;
-      cap.textContent = i;
+    (async function build() {
+      let n = 0;
+      for (let i = 1; i <= MAX; i++) {
+        if (!(await probe(i))) break;
+        n = i;
+      }
 
-      figure.dataset.num = i;
-      figure.dataset.full = `photos/${i}.jpg`;
-      figure.appendChild(img);
-      figure.appendChild(cap);
-      figure.style.display = "none";
+      for (let i = 1; i <= n; i++) {
+        const figure = document.createElement("figure");
+        const img = document.createElement("img");
+        const cap = document.createElement("figcaption");
 
-      let done = false;
-      img.onload = () => {
-        if (done) return; done = true;
-        figure.style.display = "";
+        img.loading = "lazy";
+        img.decoding = "async";
+        img.alt = "照片 " + i;
+        img.src = `photos/thumbs/${i}.jpg`;
+        cap.textContent = i;
+
+        figure.dataset.num = i;
+        figure.dataset.full = `photos/${i}.jpg`;
+        figure.appendChild(img);
+        figure.appendChild(cap);
+        figure.onclick = () => openAt(figures.indexOf(figure));
+
+        figures.push(figure);
+        grid.appendChild(figure);
         observer.observe(figure);
-        figure.onclick = () => openAt(visibleFigures().indexOf(figure));
-      };
-      img.onerror = () => {
-        if (done) return; done = true;
-        figure.remove();
-        settled++;
-        updateCount();
-      };
+      }
 
-      img.src = `photos/thumbs/${i}.jpg`;
-      grid.appendChild(figure);
-    }
-
-    function updateCount() {
-      const n = visibleFigures().length;
-      if (n > 0) counter.textContent = `共 ${n} 张 · 点开看看`;
-    }
-
-    // 图片陆续加载完成后更新计数
-    let ticks = 0;
-    const timer = setInterval(() => {
-      updateCount();
-      if (++ticks > 40) clearInterval(timer);
-    }, 250);
+      counter.textContent = n > 0 ? `共 ${n} 张 · 点开看看` : "还没有照片";
+    })();
   </script>
 </body>
 </html>
